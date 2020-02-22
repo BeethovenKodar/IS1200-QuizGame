@@ -1,6 +1,7 @@
 # QuizGameIS1200
 
 
+## Todo
 
 - [ ] Förstå hur displayen fungerar
 - [ ] Förstå timer, interrupt
