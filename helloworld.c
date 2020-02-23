@@ -7,7 +7,7 @@ void testFunction(int iterations);
 
 int main(void) {
     srand(time(NULL));
-    testFunction(20);
+    testFunction(2);
     return 0;
 }
 
@@ -24,4 +24,25 @@ void testFunction(int iterations) {
         generateNum(10, 20);
     }
 }
+
+void conc(char* p, char* q) {
+   int c, d;
+   
+   c = 0;
+ 
+   while (p[c] != '\0') {
+      c++;
+   }
+ 
+   d = 0;
+ 
+   while (q[d] != '\0') {
+      p[c] = q[d];
+      d++;
+      c++;    
+   }
+ 
+   p[c] = '\0';
+}
+
 // gcc -o hello helloworld.c && ./hello
