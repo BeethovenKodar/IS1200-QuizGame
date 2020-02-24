@@ -57,7 +57,7 @@ int main(void) {
 	
 
 	display_init();
-	display_string(0, "Which actor is the lead singer of a American band '30 seconds to Mars'");
+
 	display_update();
 	
 	labinit(); /* Do any lab-specific initialization */

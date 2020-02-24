@@ -2,18 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 int generateSum(int min, int max);
 void testFunction(int iterations);
 
-<<<<<<< HEAD
-=======
-int main(void) {
-    srand(time(NULL));
-    testFunction(2);
-    return 0;
-}
-
->>>>>>> 262f23690c7948906ca1ea9cb07d3db23e1b303e
 /*  Returns a random number
     between the range min and max (including max and min) */
 int generateNum(int min, int max) {
@@ -21,11 +13,11 @@ int generateNum(int min, int max) {
     printf("%d\n", random);         
     return random;                  
 }
-
+int seed = 1;
 int main(void)
 {
-   	srand(time(NULL));							//init random generator
-	
+   	srand(seed);							//init random generator
+	seed++;	
 	int tORm = 1;								//0 for text, 1 for math
 	int op = generateNum(0,3);
 	int num1 = 0;
@@ -69,15 +61,16 @@ int main(void)
 				sprintf(question,"What's %d + %d?\n", num1, num2);
 				break;
 			}
-		}
-		
-		else
-		{
-			/*array of questions*/
-			/*array of answers*/
 		}	
 		printf("%s", question);
 	}
+
+	else
+		{
+			/*array of questions*/
+			/*array of answers*/
+		}
+
 	return 0;
 }
 
@@ -87,24 +80,24 @@ void testFunction(int iterations) {
     }
 }
 
-void conc(char* p, char* q) {
-   int c, d;
+// void conc(char* p, char* q) {
+//    int c, d;
    
-   c = 0;
+//    c = 0;
  
-   while (p[c] != '\0') {
-      c++;
-   }
+//    while (p[c] != '\0') {
+//       c++;
+//    }
  
-   d = 0;
+//    d = 0;
  
-   while (q[d] != '\0') {
-      p[c] = q[d];
-      d++;
-      c++;    
-   }
+//    while (q[d] != '\0') {
+//       p[c] = q[d];
+//       d++;
+//       c++;    
+//    }
  
-   p[c] = '\0';
-}
+//    p[c] = '\0';
+// }
 
 // gcc -o hello helloworld.c && ./hello

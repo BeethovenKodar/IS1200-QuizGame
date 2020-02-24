@@ -13,11 +13,14 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
+#include <stdlib.h>
+void *stdin, *stdout, *stderr; // Detta behövs för att använda standard biblioteken!
 
-int mytime = 0x5957;
-int timeoutcount = 0;
+char question[31];    // the question to be displayed
 
-char textstring[] = "text, more text, and even more text!";
+char textQuestions[3][31]= {"Capital of Sweden?", "Capital of Finland?", "Capital of Norway?"};
+
+// char textAnswers[];
 
 /* Interrupt Service Routine */
 void user_isr( void )
@@ -28,105 +31,104 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
-  // e)
-  TRISD = TRISD | 0xFE0;
-
-  TMR2 = 0;                 
-  PR2 = (80000000 / 256 ) / 10; //count in prescale (still 1s period) and also divide by 10 for 100ms
-  T2CONSET = 0x8070;            //start timer and set prescaling to 256 1000 0000 0111 0000 --> 8070
-
-  // c)
-  volatile int* trisE = (volatile int*) 0xbf886100;
-  *trisE = *trisE & 0xFFFFFF00;
-  return;
+  TMR2 = 0;                                  
+  PR2 = (80000000 / 256 ) / 10;      //count in prescale (still 1s period) and also divide by 10 for 100ms
+  T2CONSET = 0x8070;                 //start timer and set prescaling to 256 1000 0000 0111 0000 --> 8070
 }
 
 /* This function is called repetitively from the main program */
 void labwork( void )
-{
-
-  // d) funkar detta? 
-  volatile int* portE = (volatile int*) 0xbf886110;
-
-  if((mytime & 0xFFFF) == 0x5957)
-    *portE = 0xFFFFFF00;
-
-  // h)
-  int btns = getbtns(); 
-  int sw = getsw(); 
-
-  //
-  if(btns == 0x1) {  // 0x1 motsvarar btn 2 
-    mytime = mytime & 0xFF0F;  // 001
-    if(sw > 5)
-      mytime = mytime & 0xFF00;
-    else
-      mytime = mytime | (sw << 4);
-  }
-  //
-  if(btns == 0x2) { // 0x2 motsvarar btn 3
-    mytime = mytime & 0xF0FF;  // 010
-    if(sw > 9)
-      mytime = mytime & 0xF000;
-    else
-      mytime = mytime | (sw << 8);
-  }
-
-  if(btns == 0x3) {
-    mytime = mytime & 0xF00F;  // 011
-    if(sw > 9) {
-      mytime = mytime & 0xF00F;
-    }
-    else {
-      mytime = mytime | (sw << 8);
-      mytime = mytime | (sw << 4);
-    }
-  }
-  //
-  if(btns == 0x4) { // 0x3 motsvarar btn 4
-    mytime = mytime & 0x0FFF;  // 100
-    if(sw > 5)
-      mytime = 0x0000;
-    else
-      mytime = mytime | (sw << 12);
-  }
-  //
-  if(btns == 0x5) {
-    mytime = mytime & 0x0F0F;  // 101
-    if(sw > 5) {
-      mytime = mytime & 0x0F0F; 
-    }
-    mytime = mytime | (sw << 12);
-    mytime = mytime | (sw << 4);
-  }
-  //
-  if(btns == 0x6) {
-    mytime = mytime & 0x00FF;  // 110
-    mytime = mytime | (sw << 8);
-    mytime = mytime | (sw << 12);
-  }
-
-  if(btns == 0x7) {
-    mytime = mytime & 0x000F;  // 111
-    mytime = mytime | (sw << 4);
-    mytime = mytime | (sw << 8);
-    mytime = mytime | (sw << 12);
-  }
-
-  if(timeoutcount == 10) {
-    time2string( textstring, mytime );
-    tick( &mytime );
-    display_update();
-    *portE += 1;
-    timeoutcount = 0; 
-  }
-    //delay( 5000 );
-  if(((IFS(0) & 0x100) >> 8) == 1) {
-    IFS(0) = IFS(0) & 0xFEFF;
-    timeoutcount++;
-  }
+{ 
+  
+  // display_question(create_question());
+  create_question();
+  display_string(0, question);
+  display_update();
 }
 
+// void display_question(char q[]) 
+// {
+//    int count = 0;
+//    int line = 0;
+//    while (q != '\0') {
+//      count++;
+//      if(count == 15) {
+//      }
+//    }
+//   display_string();
+// }
 
-// . /opt/mcb32tools/environment
-// 
+// void display_answers()
+// {
+  
+// }
+
+int timeoutcount = 0;
+
+void create_question()
+{
+  if (IFS(0) & 0x100)
+  {                                                                   //  
+    IFS(0) = IFS(0) & 0xFEFF;
+    timeoutcount++;
+  {
+
+  if(timeoutcount == 10) 
+  {
+    timeoutcount = 0; 
+    srand(7532790753);
+    // int textOrMath = generateNum(0,1);
+    int textOrMath = 1;
+    if(textOrMath == 1)                                               // Math question
+    {
+      int result = 0;
+      int num1 = generateNum(0,100);
+      int num2 = generateNum(0,100);
+      
+      switch (generateNum(0,3))                                       // decides operation
+      {
+        case 0:									                                      // 0 for addition
+        {
+          result = num1+num2;
+          sprintf(question,"What's %d + %d?\n", num1, num2);
+          break;
+        }
+      
+        case 1:								                                      	// 1 for subtraction
+        {
+          result = num1-num2;
+          sprintf(question,"What's %d - %d?\n", num1, num2);
+          break;
+        }
+      
+        case 2:								                                       	// 2 for multiplication
+        {
+          result = num1*num2;
+          sprintf(question,"What's %d * %d?\n", num1, num2);
+          break;
+        }
+        
+        case 3:								                                      	// 3 for division
+        {
+          num1 = generateNum(0,100);
+          num2 = generateNum(0,100);
+          result = num1/num2;
+          sprintf(question,"What's %d / %d?\n", num1, num2);
+          break;
+        }
+        
+    }
+  }
+  else
+  {
+  display_string(0, "textQuestion");
+  }
+    }
+
+}
+
+int generateNum(int min, int max)
+{
+    int random = (rand() % max-min) + min;     // Yields a result between min and max input
+    return random;                  
+} 
