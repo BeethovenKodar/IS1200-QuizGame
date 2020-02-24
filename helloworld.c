@@ -9,24 +9,25 @@ void testFunction(int iterations);
 /*  Returns a random number
     between the range min and max (including max and min) */
 int generateNum(int min, int max) {
-    int random = (rand() % max-min) + min;     // Yields a result between 
+    int random = (rand() % max-min + 1) + min;     // Yields a result between 
     printf("%d\n", random);         
-    return random;                  
+    return random;                 
 }
-int seed = 1;
+
 int main(void)
 {
-   	srand(seed);							//init random generator
-	seed++;	
+	printf("\n");
+   	srand(time(NULL));							//init random generator
 	int tORm = 1;								//0 for text, 1 for math
-	int op = generateNum(0,3);
 	int num1 = 0;
 	int num2 = 0;
+	int op = 0;
 	int result = 0;
 	char question[31];
 	
 	num1 = generateNum(0,100);
 	num2 = generateNum(0,100);
+	op = generateNum(0,3);
 	
 	if (tORm == 1)
 	{
@@ -42,27 +43,25 @@ int main(void)
 			case 1:									// 1 for subtraction
 			{
 				result = num1-num2;
-				sprintf(question,"What's %d + %d?\n", num1, num2);
+				sprintf(question,"What's %d - %d?\n", num1, num2);
 				break;
 			}
 		
 			case 2:									// 2 for multiplication
 			{
 				result = num1*num2;
-				sprintf(question,"What's %d + %d?\n", num1, num2);
+				sprintf(question,"What's %d * %d?\n", num1, num2);
 				break;
 			}
 			
 			case 3:									// 3 for division
 			{
-				num1 = generateNum(0,100);
-				num2 = generateNum(0,100);
 				result = num1/num2;
-				sprintf(question,"What's %d + %d?\n", num1, num2);
+				sprintf(question,"What's %d / %d?\n", num1, num2);
 				break;
 			}
 		}	
-		printf("%s", question);
+		printf("%s\n", question);
 	}
 
 	else
