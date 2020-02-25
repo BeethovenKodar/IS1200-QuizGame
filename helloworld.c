@@ -9,8 +9,8 @@ void testFunction(int iterations);
 /*  Returns a random number
     between the range min and max (including max and min) */
 int generateNum(int min, int max) {
-    int random = (rand() % max-min + 1) + min;     // Yields a result between 
-    printf("%d\n", random);         
+    int random = (rand() % max-min) + min;     // Yields a result between 
+    //printf("%d\n", random);         
     return random;                 
 }
 
@@ -25,10 +25,10 @@ int main(void)
 	int result = 0;
 	char question[31];
 	
-	num1 = generateNum(0,100);
-	num2 = generateNum(0,100);
-	op = generateNum(0,3);
-	
+	num1 = generateNum(0,101);
+	num2 = generateNum(0,101);
+	op = generateNum(0,4);
+
 	if (tORm == 1)
 	{
 		switch (op)
@@ -39,21 +39,21 @@ int main(void)
 				sprintf(question,"What's %d + %d?\n", num1, num2);
 				break;
 			}
-		
+	
 			case 1:									// 1 for subtraction
 			{
 				result = num1-num2;
 				sprintf(question,"What's %d - %d?\n", num1, num2);
 				break;
 			}
-		
+	
 			case 2:									// 2 for multiplication
 			{
 				result = num1*num2;
 				sprintf(question,"What's %d * %d?\n", num1, num2);
 				break;
 			}
-			
+		
 			case 3:									// 3 for division
 			{
 				result = num1/num2;

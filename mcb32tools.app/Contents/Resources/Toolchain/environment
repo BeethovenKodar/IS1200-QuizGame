@@ -1,0 +1,25 @@
+export TOOLCHAIN_INSTALL_DIR=/Applications/mcb32tools.app/Contents/Resources/Toolchain
+target=mipsel-mcb32-elf-
+
+echo "$PATH" | grep "$TOOLCHAIN_INSTALL_DIR/bin" > /dev/null || export PATH="$TOOLCHAIN_INSTALL_DIR/bin:$PATH"
+
+green=$(tput setaf 2)
+reset=$(tput sgr0)
+[ "$TARGET" = "$target" ] || export PS1="[\[$green\]mcb32\[$reset\]] $PS1"
+unset green
+unset reset
+
+export TARGET="$target"
+export AR=${TARGET}ar
+export AS=${TARGET}as
+export LD=${TARGET}ld
+export CC=${TARGET}gcc
+export CXX=${TARGET}g++
+export CPP=${TARGET}cpp
+
+export ASFLAGS="-march=mips32r2 -msoft-float"
+export CFLAGS="-march=mips32r2 -msoft-float -Wa,-msoft-float -G 0"
+export LDFLAGS="-L ${TOOLCHAIN_INSTALL_DIR}/lib/proc -L ${TOOLCHAIN_INSTALL_DIR}/lib"
+export C_INCLUDE_PATH="${TOOLCHAIN_INSTALL_DIR}/include"
+
+unset target

@@ -10,6 +10,7 @@
 - [ ] Slumpmässigt genererade frågor med math.random och array för (x, /, +, -)
 - [ ] Slumpmässigt genererade svar (a, b, c, d) där rätt svar är kodat och resten slumpat utifrån det rätta svaret
 
+- [ ] Start game screen, "Press button 1 to start game"
 
 ## Info
 

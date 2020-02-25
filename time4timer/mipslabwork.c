@@ -6,7 +6,7 @@
    This file should be changed by YOU! So you must
    add comment(s) here with your name(s) and date(s):
 
-   This file modified 2017-04-31 by Ture Teknolog 
+   This file modified 2020-02-25 by Ludvig Larsson and Cheehoe Oh 
 
    For copyright and licensing, see file COPYING */
 
@@ -15,12 +15,6 @@
 #include "mipslab.h"  /* Declatations for these labs */
 #include <stdlib.h>
 void *stdin, *stdout, *stderr; // Detta behövs för att använda standard biblioteken!
-
-char question[31];    // the question to be displayed
-
-char textQuestions[3][31]= {"Capital of Sweden?", "Capital of Finland?", "Capital of Norway?"};
-
-// char textAnswers[];
 
 /* Interrupt Service Routine */
 void user_isr( void )
@@ -31,104 +25,72 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
-  TMR2 = 0;                                  
-  PR2 = (80000000 / 256 ) / 10;      //count in prescale (still 1s period) and also divide by 10 for 100ms
-  T2CONSET = 0x8070;                 //start timer and set prescaling to 256 1000 0000 0111 0000 --> 8070
+  TMR2 = 0;                           // reset timer 2
+  PR2 = (80000000 / 256) / 10;        // count in prescale (still 1s period) and also divide by 10 for 100ms (fits 16 bit)
+  T2CONSET = 0x8070;                  // start timer and set prescaling to 256 (1)000 0000 0(111) 0000 --> 8070
+
+  TMR3 = 0;                           // reset timer 3
+  PR3 = (80000000 / 256) / 111;       // to obtain different seeds for the random generator
+
+  IECSET(0) = 0x100;                  // enable interrupt for timer 2
+
+  TRISFSET = 0x1;                     // set button 1 to input
+  TRISDSET = 0x7F;                    // set button 2-4 and switch 1-4 to inputs
+  
+  srand(TMR3);                        // give random generator seeds from TMR3
 }
 
-/* This function is called repetitively from the main program */
-void labwork( void )
-{ 
-  
-  // display_question(create_question());
-  create_question();
-  display_string(0, question);
+int gameActive = 0;
+
+void labwork(void)
+{
+  if (gameActive == 0)
+    startScreen();
+
+  if (gameActive == 1)
+  {
+    create_question();
+    display_update();
+    while(getbtns() == 0x0)
+    {
+      
+    }
+  }
+
+  // if(gameActive == 1)
+  // {
+  //   create_question();
+  //   countdown();
+  //   if (flaggan)
+  //   {
+  //     create_question();
+  //   }
+    
+    
+  // }
+}
+
+
+void display_clr()
+{
+  display_string(0, "");
+  display_string(1, "");
+  display_string(2, "");
+  display_string(3, "");
   display_update();
 }
 
-// void display_question(char q[]) 
-// {
-//    int count = 0;
-//    int line = 0;
-//    while (q != '\0') {
-//      count++;
-//      if(count == 15) {
-//      }
-//    }
-//   display_string();
-// }
-
-// void display_answers()
-// {
-  
-// }
-
-int timeoutcount = 0;
-
-void create_question()
+void startScreen()
 {
-  if (IFS(0) & 0x100)
-  {                                                                   //  
-    IFS(0) = IFS(0) & 0xFEFF;
-    timeoutcount++;
+  display_string(1, "Quiz Game");
+  display_string(2, "BTN1 to begin");
+  display_update();
+  int btns = getbtns();
+    
+  if(btns == 0x1)
   {
-
-  if(timeoutcount == 10) 
-  {
-    timeoutcount = 0; 
-    srand(7532790753);
-    // int textOrMath = generateNum(0,1);
-    int textOrMath = 1;
-    if(textOrMath == 1)                                               // Math question
-    {
-      int result = 0;
-      int num1 = generateNum(0,100);
-      int num2 = generateNum(0,100);
-      
-      switch (generateNum(0,3))                                       // decides operation
-      {
-        case 0:									                                      // 0 for addition
-        {
-          result = num1+num2;
-          sprintf(question,"What's %d + %d?\n", num1, num2);
-          break;
-        }
-      
-        case 1:								                                      	// 1 for subtraction
-        {
-          result = num1-num2;
-          sprintf(question,"What's %d - %d?\n", num1, num2);
-          break;
-        }
-      
-        case 2:								                                       	// 2 for multiplication
-        {
-          result = num1*num2;
-          sprintf(question,"What's %d * %d?\n", num1, num2);
-          break;
-        }
-        
-        case 3:								                                      	// 3 for division
-        {
-          num1 = generateNum(0,100);
-          num2 = generateNum(0,100);
-          result = num1/num2;
-          sprintf(question,"What's %d / %d?\n", num1, num2);
-          break;
-        }
-        
-    }
+    display_clr();
+    gameActive = 1;
   }
-  else
-  {
-  display_string(0, "textQuestion");
-  }
-    }
-
 }
 
-int generateNum(int min, int max)
-{
-    int random = (rand() % max-min) + min;     // Yields a result between min and max input
-    return random;                  
-} 
