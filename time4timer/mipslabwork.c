@@ -41,35 +41,49 @@ void labinit( void )
 }
 
 int gameActive = 0;
+int userAnswering = 0;
+
+int timeoutcount = 0;
 
 void labwork(void)
 {
   if (gameActive == 0)
+  {
     startScreen();
+    gameActive = 1;
+  }
+    
 
   if (gameActive == 1)
   {
-    create_question();
-    display_update();
-    while(getbtns() == 0x0)
+    if (userAnswering == 0)
     {
-      
+      create_question();
+      userAnswering == 1;
     }
+    
+    // char test[31];
+    // sprintf(test, "%d", TMR2);
   }
-
-  // if(gameActive == 1)
+ 
+  // if(IFS(0) & 0x100)
   // {
-  //   create_question();
-  //   countdown();
-  //   if (flaggan)
+  //   timeoutcount++;
+  //   if (timeoutcount == 200)
   //   {
-  //     create_question();
+  //     display_string(2, "hej");
+  //     display_update();
+  //     IFSCLR(0) = 0x100;
+  //     timeoutcount = 0;
+  //     display_string(2, "   ");
+  //     display_update();
   //   }
-    
-    
   // }
 }
 
+// void buttonPressed() {
+
+// }
 
 void display_clr()
 {
@@ -82,8 +96,9 @@ void display_clr()
 
 void startScreen()
 {
-  display_string(1, "Quiz Game");
-  display_string(2, "BTN1 to begin");
+  display_string(0, "Quiz Game");
+  display_string(1, "BTN1 to begin");
+  display_string(3, "Gametime: 60 sec");
   display_update();
   int btns = getbtns();
     
