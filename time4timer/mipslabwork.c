@@ -43,7 +43,6 @@ void labinit( void )
 int gameActive = 0;
 int userAnswering = 0;
 int timeoutcount = 0;
-
 void labwork(void)
 {
   if (gameActive == 0)
@@ -59,9 +58,14 @@ void labwork(void)
       IFSCLR(0) = 0x100;
       if (timeoutcount == 10)
       {
-        //display_string(3, "faster");
-        //display_update();
-        //timeoutcount = 0;
+        display_string(3, "testing");
+        display_update();
+      }
+      if (timeoutcount == 20)
+      {
+        display_string(3, "");
+        display_update();
+        timeoutcount = 0;
         //tick
         //char bottomRow = *score and time*
         //display_update(3, bottomRow)
@@ -81,20 +85,6 @@ void labwork(void)
     // char test[31];
     // sprintf(test, "%d", TMR2);
   }
- 
-  // if(IFS(0) & 0x100)
-  // {
-  //   timeoutcount++;
-  //   if (timeoutcount == 200)
-  //   {
-  //     display_string(2, "hej");
-  //     display_update();
-  //     IFSCLR(0) = 0x100;
-  //     timeoutcount = 0;
-  //     display_string(2, "   ");
-  //     display_update();
-  //   }
-  // }
 }
 
 // void buttonPressed() {
