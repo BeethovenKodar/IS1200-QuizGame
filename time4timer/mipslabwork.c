@@ -42,7 +42,6 @@ void labinit( void )
 
 int gameActive = 0;
 int userAnswering = 0;
-
 int timeoutcount = 0;
 
 void labwork(void)
@@ -50,16 +49,33 @@ void labwork(void)
   if (gameActive == 0)
   {
     startScreen();
-    gameActive = 1;
   }
-    
-
+  
   if (gameActive == 1)
   {
+    if(IFS(0) & 0x100)                // time remaining is displayed
+    {
+      timeoutcount++;
+      IFSCLR(0) = 0x100;
+      if (timeoutcount == 10)
+      {
+        //display_string(3, "faster");
+        //display_update();
+        //timeoutcount = 0;
+        //tick
+        //char bottomRow = *score and time*
+        //display_update(3, bottomRow)
+      }
+    }
     if (userAnswering == 0)
     {
       create_question();
-      userAnswering == 1;
+      userAnswering = 1;
+    }
+
+    if (getbtns() == (0x1 || 0x2))
+    {
+      userAnswering = 0;
     }
     
     // char test[31];
