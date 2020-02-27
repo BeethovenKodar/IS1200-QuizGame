@@ -35,7 +35,7 @@ int result;
 
 void create_question()
 {
-    int qType = generateNum(0,2);
+    int qType = 1;
     if(qType == 1)
     {
         int num1 = generateNum(0,101);  // first term
@@ -84,6 +84,18 @@ int generateNum(int min, int max)
     int random = (rand() % max-min) + min; // Yields a result between min and max-1
     return random;                  
 } 
+
+// void display_question(char *str) {
+//     char rowStr[31];
+//     int row = 0;
+//     while(str != '\0') {
+//         if(count == 16)
+
+//         *rowStr = *str;
+//         rowStr++;
+//         str++;
+//     }
+// }
 
 // void display_question(char str) {
 //     int chars = 0;

@@ -42,8 +42,12 @@ void labinit( void )
 
 int gameActive = 0;
 int userAnswering = 0;
-int timeoutcount = 0;
+int timeoutcount = 1;
 int timeout = 0;
+int time = 10;
+char scoreStr[31] = "Score:";
+//char timeStr[31] = "Time:";
+int score = 0;
 
 void labwork(void)
 {
@@ -56,22 +60,17 @@ void labwork(void)
   {
     if(IFS(0) & 0x100)                // time remaining is displayed
     {
-      timeoutcount++;
+      timeoutcount--;
       IFSCLR(0) = 0x100;
-      if (timeoutcount == 10)
+      if (timeoutcount == 0)
       {
-        display_string(3, "testing");
+        char Str[31];
+        sprintf(Str, "%s%d %d", scoreStr, score, time);
+        display_string(3, Str);
         display_update();
         timeout = 0;
-      }
-      if (timeoutcount == 20)
-      {
-        display_string(3, "");
-        display_update();
-        timeoutcount = 0;
-        //tick
-        //char bottomRow = *score and time*
-        //display_update(3, bottomRow)
+        time--;
+        timeoutcount = 10;
       }
     }
     if (userAnswering == 0)
@@ -80,10 +79,11 @@ void labwork(void)
       userAnswering = 1;
     }
 
-    if (getbtns() == (0x1) && timeout == 0)
+    if (((getbtns() == 1) && timeout == 0) || ((getbtns() == 2) && timeout == 0) || ((getbtns() == 4) && timeout == 0) || ((getbtns() == 8) && timeout == 0))
     {
       userAnswering = 0;
       timeout = 1;
+      score++;
     }
   }
 }
