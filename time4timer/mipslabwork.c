@@ -43,6 +43,8 @@ void labinit( void )
 int gameActive = 0;
 int userAnswering = 0;
 int timeoutcount = 0;
+int timeout = 0;
+
 void labwork(void)
 {
   if (gameActive == 0)
@@ -60,6 +62,7 @@ void labwork(void)
       {
         display_string(3, "testing");
         display_update();
+        timeout = 0;
       }
       if (timeoutcount == 20)
       {
@@ -77,19 +80,13 @@ void labwork(void)
       userAnswering = 1;
     }
 
-    if (getbtns() == (0x1 || 0x2))
+    if (getbtns() == (0x1) && timeout == 0)
     {
       userAnswering = 0;
+      timeout = 1;
     }
-    
-    // char test[31];
-    // sprintf(test, "%d", TMR2);
   }
 }
-
-// void buttonPressed() {
-
-// }
 
 void display_clr()
 {
