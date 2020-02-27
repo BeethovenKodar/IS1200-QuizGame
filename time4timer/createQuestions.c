@@ -1,120 +1,110 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
-void *stdin, *stdout, *stderr; // Detta behövs för att använda standard biblioteken!
 
-char question[31];    // the question to be displayed
+void *stdin, *stdout, *stderr; // Detta behövs för att använda standardbiblioteken!                        
 
-char textQuestions[10][31] = {"Number of continents", 
-                              "How many landscapes exist?", 
-                              "How many countries are there?",
-                              "How many genders exist?",
-                              "When did WW1 start?",
-                              "When did the Berlin wall fall?",
-                              "When was KTH founded?",
-                              "How old is Trump?",
-                              "",
-                              ""};
+int result;         // result of the task
+int resultBTN;      // button that gives correct answer
+int UB;             // upper bound for random
+int LB;             // lower bound for random
 
-char textAnswers[10][31] = {"a)4 b)6 c)7 d)8",               //7 is correct     [2]
-                            "a)10 b)25 c)18 d)20",           //20 is correct    [3]
-                            "a)200 b)150 c)265 d)195",       //200 is correct   [0]
-                            "a)2 b)3 c)infinite d)10",       //infinite         [2]
-                            "a)1914 b)1913 c)1916 d)1942",   //1914             [0]
-                            "a)2003 b)1989 c)1999 d)1990",   //1989             [1]
-                            "a)1930 b)1827 c)1901 d)1854",   //1827             [1]
-                            "a)53 b)68 c)65 d)73",           //73               [3]
-                            "a) b) c) d)",                   //
-                            "a) b) c) d)"};                  //
-                        
+char question[16];
 
-int rightAnswers[10] ={2, 3, 0, 1, 0, 1, 1, 10, 10, 10};
-
-int questionNumber;
-int result;
-
-void create_question()
+// returns button for right answer
+int create_question(int difficulty)     
 {
-    int qType = 1;
-    if(qType == 1)
+    if (difficulty == 2)      // EASY (numbers between 1-10)
     {
-        int num1 = generateNum(0,101);  // first term
-        int num2 = generateNum(0,101);  // second term
-        switch (generateNum(0,4))       // decides operation
-        {
-            case 0: // 0 for addition
-            {
-                result = num1+num2;
-                sprintf(question,"What's %d + %d?\n", num1, num2);
-                break;
-            }
-            case 1:	// 1 for subtraction
-            {
-                result = num1-num2;
-                sprintf(question,"What's %d - %d?\n", num1, num2);
-                break;
-            }
-            case 2:	// 2 for multiplication
-            {
-                result = num1*num2;
-                sprintf(question,"What's %d * %d?\n", num1, num2);
-                break;
-            }
-            case 3:	// 3 for division
-            {
-                result = num1/num2;
-                sprintf(question,"What's %d / %d?\n", num1, num2);
-                break;
-            }
-        }
-        display_string(0, question);
-        display_update();
-    } 
-    else
-    {
-        questionNumber = generateNum(0,4);
-        display_string(0, textQuestions[questionNumber]);
-        display_update();
+        UB = 11;
+        LB = 1;
     }
-    
+    if (difficulty == 4)      // MEDIUM (numbers between 10-20)
+    {
+        UB = 21;
+        LB = 10;
+    }
+    if (difficulty == 8)      // HARD (numbers between 80-100)
+    {
+        UB = 101;
+        LB = 80;
+    }
+
+    int num1 = generateNum(LB, UB);      // first term
+    int num2 = generateNum(LB, UB);      // second term
+    switch (generateNum(0,4))            // decides operation
+    {
+        case 0: // 0 for addition
+        {
+            result = num1+num2;
+            sprintf(question,"What's %d + %d?\n", num1, num2);
+            break;
+        }
+        case 1:	// 1 for subtraction
+        {
+            result = num1-num2;
+            sprintf(question,"What's %d - %d?\n", num1, num2);
+            break;
+        }
+        case 2:	// 2 for multiplication
+        {
+            result = num1*num2;
+            sprintf(question,"What's %d * %d?\n", num1, num2);
+            break;
+        }
+        case 3:	// 3 for division
+        {
+            result = num1/num2;
+            sprintf(question,"What's %d / %d?\n", num1, num2);
+            break;
+        }
+    }
+
+    genAnswers(result);
+    display_string(0, question);
+    display_update();
+    return resultBTN; 
 }
 
-int generateNum(int min, int max)
+char row1[16];
+char row2[16];
+
+void genAnswers(int rightAnswer)
 {
-    int random = (rand() % max-min) + min; // Yields a result between min and max-1
+    int rightAnswerIndex = generateNum(0,4);
+
+    resultBTN = powerFunc(2, rightAnswerIndex); 
+    int answers[4];
+    answers[rightAnswerIndex] = rightAnswer;
+    int i = 0;
+    while(i < 4)
+    {
+        if (i != rightAnswerIndex)
+        {
+            answers[i] = rightAnswer + generateNum(-5,6);
+        }
+        i++;
+    }
+
+    sprintf(row1, "A)%d  B)%d", answers[0], answers[1]);
+    sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
+    display_string(1, row1);
+    display_string(2, row2);
+}
+
+int generateNum(int min, int max)          // Gives a result [min, max-1]
+{
+    int random = (rand() % (max-min)) + min; 
     return random;                  
 } 
 
-// void display_question(char *str) {
-//     char rowStr[31];
-//     int row = 0;
-//     while(str != '\0') {
-//         if(count == 16)
+int powerFunc(int base, unsigned int exponent) 
+{ 
+    if (exponent == 0) 
+        return 1; 
+    else if (exponent%2 == 0) 
+        return powerFunc(base, exponent/2)*powerFunc(base, exponent/2); 
+    else
+        return base*powerFunc(base, exponent/2)*powerFunc(base, exponent/2); 
+}
 
-//         *rowStr = *str;
-//         rowStr++;
-//         str++;
-//     }
-// }
-
-// void display_question(char str) {
-//     int chars = 0;
-//     int wordLength = 0;
-//     int row = 0;
-//     char rowStr[31];
-//     int pos = 0;
-//     while (str != '\0') 
-//     {
-//         while (str != 0x20 && (wordLength <= 16-chars))
-//         {
-//             wordLength++;
-//             chars++;
-//             pos++;
-//             str++;
-//         }
-//         display_string(row, rowStr)
-//         display_update();
-//         row++;
-       
-//     }
-// }

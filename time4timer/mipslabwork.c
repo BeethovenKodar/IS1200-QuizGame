@@ -37,7 +37,7 @@ void labinit( void )
   TRISFSET = 0x1;                     // set button 1 to input
   TRISDSET = 0x7F;                    // set button 2-4 and switch 1-4 to inputs
   
-  srand(TMR3);                        // give random generator seeds from TMR3
+  srand(TMR3 ^ TMR2);                 // give random generator seeds from TMR3
 }
 
 int gameActive = 0;
@@ -46,8 +46,10 @@ int timeoutcount = 1;
 int timeout = 0;
 int time = 10;
 char scoreStr[31] = "Score:";
-//char timeStr[31] = "Time:";
+char timeStr[31] = "Time:";
 int score = 0;
+int gameMode; //2easy, 4medium, 8hard
+int correct;
 
 void labwork(void)
 {
@@ -58,14 +60,14 @@ void labwork(void)
   
   if (gameActive == 1)
   {
-    if(IFS(0) & 0x100)                // time remaining is displayed
+    if (IFS(0) & 0x100)                // time remaining
     {
       timeoutcount--;
       IFSCLR(0) = 0x100;
       if (timeoutcount == 0)
       {
         char Str[31];
-        sprintf(Str, "%s%d %d", scoreStr, score, time);
+        sprintf(Str, "%s%d   %d", scoreStr, score, time);
         display_string(3, Str);
         display_update();
         timeout = 0;
@@ -73,9 +75,10 @@ void labwork(void)
         timeoutcount = 10;
       }
     }
+
     if (userAnswering == 0)
     {
-      create_question();
+      correct = create_question(gameMode);
       userAnswering = 1;
     }
 
@@ -83,8 +86,20 @@ void labwork(void)
     {
       userAnswering = 0;
       timeout = 1;
-      score++;
+      if (correct == getbtns())
+      {
+        score++;
+        time = time+2;
+      }
+      else
+      {
+        time = time-1;
+      }
+        
     }
+
+    if (time == -1)
+      endScreen();
   }
 }
 
@@ -99,16 +114,38 @@ void display_clr()
 
 void startScreen()
 {
-  display_string(0, "Quiz Game");
-  display_string(1, "BTN1 to begin");
-  display_string(3, "Gametime: 60 sec");
+  display_string(0, "MATH GENIUS?");
+  display_string(1, "BTN 2 EASY");
+  display_string(2, "BTN 3 MEDIUM");
+  display_string(3, "BTN 4 HARD");
   display_update();
-  int btns = getbtns();
     
-  if(btns == 0x1)
+  if((getbtns() == 2) || (getbtns() == 4) || (getbtns() == 8))  // BTN2 - easy, BTN3 - medium, BTN4 - hard
   {
     display_clr();
     gameActive = 1;
+    gameMode = getbtns();
   }
+}
+
+int nameEntry = 0;
+int charASCII;
+
+void endScreen()
+{
+  display_clr();
+  while(nameEntry == 0)
+  {
+    display_string(0, "   GAME OVER!");
+    display_string(2, "ENTER NAME: ");
+    display_update();
+
+    display_string(0, "");
+    display_update();
+  }
+
+
+  
+  
 }
 
