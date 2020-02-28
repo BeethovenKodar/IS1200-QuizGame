@@ -8,12 +8,14 @@ int result;         // result of the task
 int resultBTN;      // button that gives correct answer
 int UB;             // upper bound for random
 int LB;             // lower bound for random
-
-char question[16];
+char question[16];  // generated question
+char row1[16];      // row 1 on display
+char row2[16];      // row 2 on display
 
 // returns button for right answer
 int create_question(int difficulty)     
 {
+    //
     if (difficulty == 2)      // EASY (numbers between 1-10)
     {
         UB = 11;
@@ -29,7 +31,9 @@ int create_question(int difficulty)
         UB = 101;
         LB = 80;
     }
+    //
 
+    //
     int num1 = generateNum(LB, UB);      // first term
     int num2 = generateNum(LB, UB);      // second term
     switch (generateNum(0,4))            // decides operation
@@ -59,21 +63,22 @@ int create_question(int difficulty)
             break;
         }
     }
+    //
 
-    genAnswers(result);
     display_string(0, question);
+    genAnswers(result);
+    display_string(1, row1);
+    display_string(2, row2);
     display_update();
+
     return resultBTN; 
 }
 
-char row1[16];
-char row2[16];
+int answers[4];
 
 void genAnswers(int rightAnswer)
 {
     int rightAnswerIndex = generateNum(0,4);
-
-    int answers[4];
     answers[rightAnswerIndex] = rightAnswer;
 
     int i = 0;
@@ -81,12 +86,14 @@ void genAnswers(int rightAnswer)
     int generatedFalseNumber;
     while(i < 4)
     {
-        if (i != rightAnswerIndex)
+        if (i != (rightAnswerIndex)
         {
             generatedFalseNumber = rightAnswer + generateNum(-5,6);
             j = 0;
-            for(j = 0; j < 4; j++) {
-                if(answers[j] == generatedFalseNumber) {
+            for(j = 0; j < 4; j++) 
+            {
+                while((answers[j] == generatedFalseNumber) || (answers[j] == rightAnswer))
+                {
                     generatedFalseNumber = rightAnswer + generateNum(-5, 6);
                 }
             }
@@ -98,23 +105,22 @@ void genAnswers(int rightAnswer)
 
     sprintf(row1, "A)%d  B)%d", answers[0], answers[1]);
     sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
-    display_string(1, row1);
-    display_string(2, row2);
 }
 
-int generateNum(int min, int max)          // Gives a result [min, max-1]
+int generateNum (int min, int max)          // Gives a result [min, max-1]
 {
     int random = (rand() % (max-min)) + min; 
     return random;                  
 } 
 
-int powerFunc(int base, unsigned int exponent) 
-{ 
-    if (exponent == 0) 
-        return 1; 
-    else if (exponent%2 == 0) 
-        return powerFunc(base, exponent/2)*powerFunc(base, exponent/2); 
-    else
-        return base*powerFunc(base, exponent/2)*powerFunc(base, exponent/2); 
+int powerFunc (int base, int exponent)
+{
+    int i;
+    int number = 1;
+
+    for (i = 0; i < exponent; ++i)
+        number *= base;
+
+    return(number);
 }
 
