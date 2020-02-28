@@ -44,7 +44,7 @@ int gameActive = 0;
 int userAnswering = 0;
 int timeoutcount = 1;
 int timeout = 0;
-int time = 10;
+int time = 50;
 char scoreStr[31] = "Score:";
 char timeStr[31] = "Time:";
 int score = 0;
@@ -71,7 +71,7 @@ void labwork(void)
         display_string(3, Str);
         display_update();
         timeout = 0;
-        time--;
+        //time--;
         timeoutcount = 10;
       }
     }
@@ -89,16 +89,15 @@ void labwork(void)
       if (correct == getbtns())
       {
         score++;
-        time = time+2;
+        time = time+3;
       }
       else
       {
         time = time-1;
-      }
-        
+      } 
     }
 
-    if (time == -1)
+    if (time <= -1)
       endScreen();
   }
 }
@@ -128,24 +127,46 @@ void startScreen()
   }
 }
 
+char finalScore[16];
+char name[3] = {'A', 'A', 'A'};
+char displayName[16];
+int nameIndex = 0;
 int nameEntry = 0;
 int charASCII;
 
 void endScreen()
 {
   display_clr();
+  sprintf(finalScore,"Your score: %d", score);
   while(nameEntry == 0)
   {
+    sprintf(displayName, "NAME: %c%c%c", name[0], name[1], name[2]);
     display_string(0, "   GAME OVER!");
-    display_string(2, "ENTER NAME: ");
+    display_string(2, finalScore);
+    display_string(3, displayName);
     display_update();
-
     display_string(0, "");
     display_update();
+
+    if(IFS(0) & 0x100)
+    {
+      if(nameIndex != 4) 
+      {
+        if(getbtns() == 8)
+        {
+          if (name[nameIndex] == 90)
+            name[nameIndex] = 65; // A
+            
+          name[nameIndex]++;
+        }
+
+        if(getbtns() == 4)
+          nameIndex++;
+      
+      IFSCLR(0) = 0x100;
+      
+      }
+    }
   }
-
-
-  
-  
 }
 
