@@ -60,6 +60,11 @@ void labwork(void)
   
   if (gameActive == 1)
   {
+
+    if(getsw() == 1)
+    {
+      display_string(0, "hej");
+    }
     if (IFS(0) & 0x100)                // time remaining
     {
       timeoutcount--;

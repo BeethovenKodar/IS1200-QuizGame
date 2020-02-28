@@ -73,18 +73,28 @@ void genAnswers(int rightAnswer)
 {
     int rightAnswerIndex = generateNum(0,4);
 
-    resultBTN = powerFunc(2, rightAnswerIndex); 
     int answers[4];
     answers[rightAnswerIndex] = rightAnswer;
+
     int i = 0;
+    int j = 0;
+    int generatedFalseNumber;
     while(i < 4)
     {
         if (i != rightAnswerIndex)
         {
-            answers[i] = rightAnswer + generateNum(-5,6);
+            generatedFalseNumber = rightAnswer + generateNum(-5,6);
+            j = 0;
+            for(j = 0; j < 4; j++) {
+                if(answers[j] == generatedFalseNumber) {
+                    generatedFalseNumber = rightAnswer + generateNum(-5, 6);
+                }
+            }
+            answers[i] = generatedFalseNumber;
         }
         i++;
     }
+    resultBTN = powerFunc(2, rightAnswerIndex); 
 
     sprintf(row1, "A)%d  B)%d", answers[0], answers[1]);
     sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
