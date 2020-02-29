@@ -182,11 +182,10 @@ void endScreen()
         score = 0;
         nameEntry = 1;
         gameActive = 0;
-  sort(scoreboard_scores);
       }
     }
   }
-  sort(scoreboard_scores);
+  sort();
   scoreBoard();
 }
 
@@ -212,10 +211,11 @@ void swap(int *a, int *b)
 
 void sort() {
   if (scoreboard_scores[0] > scoreboard_scores[1]) 
-    swap(scoreboard_scores[0], scoreboard_scores[1]);
+    swap(&scoreboard_scores[0], &scoreboard_scores[1]);
   if (scoreboard_scores[1] > scoreboard_scores[2]) 
-    swap(scoreboard_scores[1], scoreboard_scores[2]);
+    swap(&scoreboard_scores[1],&scoreboard_scores[2]);
   if (scoreboard_scores[2] > scoreboard_scores[0]) 
-    swap(scoreboard_scores[2], scoreboard_scores[0]);
+    swap(&scoreboard_scores[2], &scoreboard_scores[0]);
 }
 
+//. /opt/mcb32tools/environment
