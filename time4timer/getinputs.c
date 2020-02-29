@@ -12,5 +12,3 @@ int getbtns(void) // returns the status of the buttons
 {
     return ((PORTD & 0xE0) >> 4) | ((PORTF & 0x2) >> 1);
 }
-
-// 1100 ^ 1100 = 0011

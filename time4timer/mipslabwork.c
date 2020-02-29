@@ -42,38 +42,38 @@ void labinit (void)
 
 int gameActive = 0;
 int userAnswering = 0;
-int timeoutcount = 1;
+int timeoutcount = 10;
 int timeout = 0;
-int time = 50;
-char scoreStr[31] = "Score:";
-char timeStr[31] = "Time:";
+int time = 5;
 int score = 0;
-int gameMode; //2easy, 4medium, 8hard
+int lock = 0;
+int gameMode; // 2easy, 4medium, 8hard
 int correct;
 
 void labwork(void)
 {
-  if (gameActive == 0)
+  while (gameActive == 0)
   {
     startScreen();
   }
   
-  if (gameActive == 1)
+  while (gameActive == 1 && time > -1)
   {
+    char Str[31];
     if (IFS(0) & 0x100)                // time remaining
     {
-      timeoutcount--;
-      IFSCLR(0) = 0x100;
-      if (timeoutcount == 0)
+      if (timeoutcount == 10)          // one second
       {
-        char Str[31];
-        sprintf(Str, "%s%d %d %d", scoreStr, score, time, correct);
+        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
         display_string(3, Str);
         display_update();
         timeout = 0;
-        //time--;
-        timeoutcount = 10;
+        time--;
+        timeoutcount = 0;
+        lock = 1;
       }
+      timeoutcount++;
+      IFSCLR(0) = 0x100;
     }
 
     if (userAnswering == 0)
@@ -82,7 +82,7 @@ void labwork(void)
       userAnswering = 1;
     }
 
-    if (((getbtns() == 1) && timeout == 0) || ((getbtns() == 2) && timeout == 0) || ((getbtns() == 4) && timeout == 0) || ((getbtns() == 8) && timeout == 0))
+    if (((getbtns() == 1) || (getbtns() == 2) || (getbtns() == 4) || (getbtns() == 8)) && (timeout == 0)) 
     {
       userAnswering = 0;
       timeout = 1;
@@ -90,16 +90,20 @@ void labwork(void)
       {
         score++;
         time = time+3;
+        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
+        display_string(3, Str);
+        display_update();
       }
       else
       {
         time = time-1;
+        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
+        display_string(3, Str);
+        display_update();
       } 
     }
-
-    if (time <= -1)
-      endScreen();
   }
+  endScreen();
 }
 
 void display_clr()
@@ -119,20 +123,23 @@ void startScreen()
   display_string(3, "BTN 4 HARD");
   display_update();
     
-  if((getbtns() == 2) || (getbtns() == 4) || (getbtns() == 8))  // BTN2 - easy, BTN3 - medium, BTN4 - hard
+  if((getbtns() != 0) && (getbtns() != 1))
   {
     display_clr();
     gameActive = 1;
-    gameMode = getbtns();
+    gameMode = getbtns(); // BTN2 - easy, BTN3 - medium, BTN4 - hard
   }
 }
 
 char finalScore[16];
 char name[3] = {'A', 'A', 'A'};
 char displayName[16];
+
 int nameIndex = 0;
 int nameEntry = 0;
-int charASCII;
+int scoreboard_scores[3];
+char scoreboard_names[3][3];
+int sb_scoresIndex = 0;
 
 void endScreen()
 {
@@ -150,12 +157,12 @@ void endScreen()
 
     if(IFS(0) & 0x100)
     {
-      if(nameIndex != 4) 
+      if(nameIndex < 3) 
       {
         if(getbtns() == 8)
         {
-          if (name[nameIndex] == 90)
-            name[nameIndex] = 65; // A
+          if (name[nameIndex] == 90)  // If the char increments above Z it will reset to A
+            name[nameIndex] = 65;
             
           name[nameIndex]++;
         }
@@ -164,9 +171,20 @@ void endScreen()
           nameIndex++;
       
       IFSCLR(0) = 0x100;
-      
       }
+      if(nameIndex == 3) 
+      {
+        nameEntry = 1;
+        scoreboard_scores[3] = score;
+      }
+      
     }
   }
+  // scoreBoard();
 }
+
+// void scoreBoard()
+// {
+
+// }
 

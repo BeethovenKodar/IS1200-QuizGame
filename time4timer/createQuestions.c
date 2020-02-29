@@ -56,10 +56,10 @@ int create_question(int difficulty)
             sprintf(question,"What's %d * %d?\n", num1, num2);
             break;
         }
-        case 3:	// 3 for division
+        case 3:	// 3 for modulus
         {
-            result = num1/num2;
-            sprintf(question,"What's %d / %d?\n", num1, num2);
+            result = num1%num2;
+            sprintf(question,"What's %d '/. %d?\n", num1, num2);
             break;
         }
     }
