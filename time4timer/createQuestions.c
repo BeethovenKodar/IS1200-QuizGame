@@ -86,7 +86,7 @@ void genAnswers(int rightAnswer)
     int generatedFalseNumber;
     while(i < 4)
     {
-        if (i != (rightAnswerIndex)
+        if (i != (rightAnswerIndex))
         {
             generatedFalseNumber = rightAnswer + generateNum(-5,6);
             j = 0;
@@ -124,3 +124,5 @@ int powerFunc (int base, int exponent)
     return(number);
 }
 
+
+// . /opt/mcb32tools/environment
