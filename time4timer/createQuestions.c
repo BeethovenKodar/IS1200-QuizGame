@@ -83,18 +83,21 @@ void genAnswers(int rightAnswer)
 
     int i = 0;
     int j = 0;
+    int valid = 0;
     int generatedFalseNumber;
     while(i < 4)
     {
-        if (i != (rightAnswerIndex)
+        if (i != rightAnswerIndex)
         {
             generatedFalseNumber = rightAnswer + generateNum(-5,6);
-            j = 0;
-            for(j = 0; j < 4; j++) 
+            while (valid != 1)
             {
-                while((answers[j] == generatedFalseNumber) || (answers[j] == rightAnswer))
+                for (j; j < i; j++)
                 {
-                    generatedFalseNumber = rightAnswer + generateNum(-5, 6);
+                    if (answers[j] == generatedFalseNumber)
+                        generatedFalseNumber = rightAnswer + generateNum(-5,6);
+                    if (j == 3)
+                        break;
                 }
             }
             answers[i] = generatedFalseNumber;
