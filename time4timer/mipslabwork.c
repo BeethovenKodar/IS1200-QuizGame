@@ -6,7 +6,7 @@
    This file should be changed by YOU! So you must
    add comment(s) here with your name(s) and date(s):
 
-   This file modified 2020-02-29 by Ludvig Larsson and Cheehoe Oh 
+   This file modified 2020-02-25 by Ludvig Larsson and Cheehoe Oh 
 
    For copyright and licensing, see file COPYING */
 
@@ -14,7 +14,7 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
 #include <stdlib.h>
-void *stdin, *stdout, *stderr; // För att använda standardbiblioteken
+void *stdin, *stdout, *stderr; // Detta behövs för att använda standard biblioteken!
 
 /* Interrupt Service Routine */
 void user_isr (void)
@@ -37,68 +37,43 @@ void labinit (void)
   TRISFSET = 0x1;                     // set button 1 to input
   TRISDSET = 0x7F;                    // set button 2-4 and switch 1-4 to inputs
   
-  srand(TMR3);                        // give random generator seeds from TMR3
+  srand(TMR3 ^ TMR2);                 // give random generator seeds from TMR3
 }
 
 int gameActive = 0;
 int userAnswering = 0;
-int timeoutcount = 0;
+int timeoutcount = 1;
 int timeout = 0;
-int time = 10;
+int time = 50;
+char scoreStr[31] = "Score:";
+char timeStr[31] = "Time:";
 int score = 0;
-int gameMode; // 2 = easy, 4 = medium, 8 = hard
+int gameMode; //2easy, 4medium, 8hard
 int correct;
-char Str[31]; // used for bottom line of display
 
-/*#####################################################################################################*/
-
-/* "main function" */
 void labwork(void)
 {
-  while (gameActive == 0)
+  if (gameActive == 0)
   {
     startScreen();
   }
-
-  while (gameActive == 1 && time > -1)
+  
+  if (gameActive == 1)
   {
-    if (IFS(0) & 0x100)
+    if (IFS(0) & 0x100)                // time remaining
     {
-      if(getbtns != 0)
+      timeoutcount--;
+      IFSCLR(0) = 0x100;
+      if (timeoutcount == 0)
       {
-        if((getbtns() == correct) && timeout == 0)
-        {
-          score++;
-          time = time + 3;
-          sprintf(Str, "%s%d %d", "Score:", score, "Time:");
-          display_string(3, Str);
-          display_update();
-        }
-        else
-        {
-          time = time - 1;
-          sprintf(Str, "%s%d %d", "Score:", score, "Time:");
-          display_string(3, Str);
-          display_update();
-        }
-      TMR3 = TMR3 + (getbtns() * 1000);
-      userAnswering = 0;
-      timeout = 1;
-      }
-
-      /* time is updated each second */
-      if (timeoutcount == 10)
-      {
-        sprintf(Str, "%s%d %d", "Score:", score, "Time:");
+        char Str[31];
+        sprintf(Str, "%s%d %d %d", scoreStr, score, time, correct);
         display_string(3, Str);
         display_update();
         timeout = 0;
-        time--;
-        timeoutcount = 0;
+        //time--;
+        timeoutcount = 10;
       }
-
-      timeoutcount++;
-      IFSCLR(0) = 0x100;
     }
 
     if (userAnswering == 0)
@@ -106,14 +81,28 @@ void labwork(void)
       correct = create_question(gameMode);
       userAnswering = 1;
     }
+
+    if (((getbtns() == 1) && timeout == 0) || ((getbtns() == 2) && timeout == 0) || ((getbtns() == 4) && timeout == 0) || ((getbtns() == 8) && timeout == 0))
+    {
+      userAnswering = 0;
+      timeout = 1;
+      if (correct == getbtns())
+      {
+        score++;
+        time = time+3;
+      }
+      else
+      {
+        time = time-1;
+      } 
+    }
+
+    if (time <= -1)
+      endScreen();
   }
-  endScreen();
 }
 
-/*#####################################################################################################*/
-
-/* Clears the whole display*/
-void display_clear()
+void display_clr()
 {
   display_string(0, "");
   display_string(1, "");
@@ -122,39 +111,32 @@ void display_clear()
   display_update();
 }
 
-/* ##################################################################################################### */
-
-/* Start screen visuals */
 void startScreen()
 {
   display_string(0, "MATH GENIUS?");
-  display_string(1, "BTN2 - Easy");
-  display_string(2, "BTN3 - Medium");
-  display_string(3, "BTN4 - Hard");
+  display_string(1, "BTN 2 EASY");
+  display_string(2, "BTN 3 MEDIUM");
+  display_string(3, "BTN 4 HARD");
   display_update();
     
-  if((getbtns() != 0) || getbtns() != 1)
+  if((getbtns() == 2) || (getbtns() == 4) || (getbtns() == 8))  // BTN2 - easy, BTN3 - medium, BTN4 - hard
   {
-    display_clear();
+    display_clr();
     gameActive = 1;
-    gameMode = getbtns();     // BTN2 - easy, BTN3 - medium, BTN4 - hard
+    gameMode = getbtns();
   }
 }
 
-/* ##################################################################################################### */
-
-/* global variables used in endScreen function */
 char finalScore[16];
 char name[3] = {'A', 'A', 'A'};
 char displayName[16];
 int nameIndex = 0;
 int nameEntry = 0;
+int charASCII;
 
-/* End screen visuals */
 void endScreen()
 {
-  gameActive = 0;
-  display_clear();
+  display_clr();
   sprintf(finalScore,"Your score: %d", score);
   while(nameEntry == 0)
   {
@@ -168,22 +150,23 @@ void endScreen()
 
     if(IFS(0) & 0x100)
     {
-      while(nameIndex != 4) 
+      if(nameIndex != 4) 
       {
         if(getbtns() == 8)
         {
           if (name[nameIndex] == 90)
             name[nameIndex] = 65; // A
+            
           name[nameIndex]++;
         }
 
         if(getbtns() == 4)
           nameIndex++;
-      }
+      
       IFSCLR(0) = 0x100;
+      
+      }
     }
   }
 }
-
-/* ##################################################################################################### */
 
