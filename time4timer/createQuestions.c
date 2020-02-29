@@ -2,17 +2,22 @@
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
 
-void *stdin, *stdout, *stderr; // Detta behövs för att använda standardbiblioteken!                        
+void *stdin, *stdout, *stderr; // Detta behövs för att använda standardbiblioteken!  
 
-int result;         // result of the task
-int resultBTN;      // button that gives correct answer
-int UB;             // upper bound for random
-int LB;             // lower bound for random
-char question[16];  // generated question
-char row1[16];      // row 1 on display
-char row2[16];      // row 2 on display
+/*#####################################################################################################*/
 
-// returns button for right answer
+
+int  UB;             // upper bound for random
+int  LB;             // lower bound for random
+char question[16];   // generated question
+int  result;         // result of the task
+int  resultBTN;      // button that gives correct answer
+char row1[16];       // row 1 on display
+char row2[16];       // row 2 on display
+
+/*#####################################################################################################*/
+
+/* returns button for right answer */
 int create_question(int difficulty)     
 {
     //
@@ -39,29 +44,24 @@ int create_question(int difficulty)
     switch (generateNum(0,4))            // decides operation
     {
         case 0: // 0 for addition
-        {
             result = num1+num2;
             sprintf(question,"What's %d + %d?\n", num1, num2);
             break;
-        }
+        
         case 1:	// 1 for subtraction
-        {
             result = num1-num2;
             sprintf(question,"What's %d - %d?\n", num1, num2);
             break;
-        }
+
         case 2:	// 2 for multiplication
-        {
             result = num1*num2;
             sprintf(question,"What's %d * %d?\n", num1, num2);
             break;
-        }
+        
         case 3:	// 3 for division
-        {
             result = num1/num2;
             sprintf(question,"What's %d / %d?\n", num1, num2);
             break;
-        }
     }
 
     display_string(0, question);
@@ -72,6 +72,8 @@ int create_question(int difficulty)
 
     return resultBTN; 
 }
+
+/*#####################################################################################################*/
 
 int answers[4];
 
@@ -103,6 +105,9 @@ void genAnswers(int rightAnswer)
     sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
 }
 
+/*#####################################################################################################*/
+
+/* inverts the button signal */
 int invert(int num)
 {
     switch (num)
@@ -122,12 +127,14 @@ int invert(int num)
     }
 }
 
-int generateNum (int min, int max)          // Gives a result [min, max-1]
+/* generates random numbers between min and max-1 */
+int generateNum (int min, int max)
 {
     int random = (rand() % (max-min)) + min; 
     return random;   
 } 
 
+/* used to convert indexes to buttons */
 int powerFunc (int base, int exponent)
 {
     int i;
@@ -136,6 +143,8 @@ int powerFunc (int base, int exponent)
         number *= base;
     return(number);
 }
+
+/*#####################################################################################################*/
 
 
 // . /opt/mcb32tools/environment
