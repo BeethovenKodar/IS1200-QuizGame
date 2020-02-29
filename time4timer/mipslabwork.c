@@ -41,23 +41,24 @@ void labinit (void)
 }
 
 int gameActive = 0;
-int userAnswering = 0;
-int timeoutcount = 10;
-int timeout = 0;
 int time = 5;
 int score = 0;
-int lock = 0;
-int gameMode; // 2easy, 4medium, 8hard
+int gameMode;  // 2easy, 4medium, 8hard
 int correct;
 
 void labwork(void)
 {
+  //
+  int userAnswering = 0;
+  int timeoutcount = 10;
+  int timeout = 0;
+  //
   while (gameActive == 0)
-  {
+  { 
     startScreen();
   }
   
-  while (gameActive == 1 && time > -1)
+  while (gameActive == 1 && time > -1 && getsw() != 0x4) //GETSW BARA FÖR DEBUG
   {
     char Str[31];
     if (IFS(0) & 0x100)                // time remaining
@@ -70,7 +71,6 @@ void labwork(void)
         timeout = 0;
         time--;
         timeoutcount = 0;
-        lock = 1;
       }
       timeoutcount++;
       IFSCLR(0) = 0x100;
@@ -78,8 +78,12 @@ void labwork(void)
 
     if (userAnswering == 0)
     {
+      sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
+      display_string(3, Str);
+      display_update();
       correct = create_question(gameMode);
       userAnswering = 1;
+      delay(3000);
     }
 
     if (((getbtns() == 1) || (getbtns() == 2) || (getbtns() == 4) || (getbtns() == 8)) && (timeout == 0)) 
@@ -90,20 +94,15 @@ void labwork(void)
       {
         score++;
         time = time+3;
-        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
-        display_string(3, Str);
-        display_update();
       }
       else
       {
         time = time-1;
-        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
-        display_string(3, Str);
-        display_update();
       } 
     }
   }
   endScreen();
+  display_string(0, "hej");
 }
 
 void display_clr()
@@ -131,18 +130,17 @@ void startScreen()
   }
 }
 
-char finalScore[16];
-char name[3] = {'A', 'A', 'A'};
-char displayName[16];
 
-int nameIndex = 0;
-int nameEntry = 0;
-int scoreboard_scores[3];
-char scoreboard_names[3][3];
-int sb_scoresIndex = 0;
+int scoreboard_scores[3] = {0,0,0};
+char *name_ptr;
 
 void endScreen()
 {
+  int nameIndex = 0;
+  int nameEntry = 0;
+  char finalScore[16];
+  char displayName[16];
+  char name[4] = {'A', 'A', 'A', '\0'};
   display_clr();
   sprintf(finalScore,"Your score: %d", score);
   while(nameEntry == 0)
@@ -167,24 +165,57 @@ void endScreen()
           name[nameIndex]++;
         }
 
-        if(getbtns() == 4)
+        if(getbtns() == 4) {
           nameIndex++;
+        }
       
       IFSCLR(0) = 0x100;
       }
       if(nameIndex == 3) 
       {
+        // delay(5000); ????
+        scoreboard_scores[2] = score;
+        name_ptr = name;
+
+        /* Reset variables */
+        time = 5;
+        score = 0;
         nameEntry = 1;
-        scoreboard_scores[3] = score;
+        gameActive = 0;
+  sort(scoreboard_scores);
       }
-      
     }
   }
-  // scoreBoard();
+  sort(scoreboard_scores);
+  scoreBoard();
 }
 
-// void scoreBoard()
-// {
+void scoreBoard()
+{
+  char Str[31];
+  display_clr();
+  int i = 0;
+  for(i; i < 3; i++) {
+    sprintf(Str, "%s%d %s%s", "Score:", scoreboard_scores[i], "Name:", name_ptr);
+    display_string(i, Str);
+  }
+  display_update();
+  delay(25000);
+}
 
-// }
+void swap(int *a, int *b) 
+{ 
+    int temp = *a; 
+    *a = *b; 
+    *b = temp; 
+} 
+
+void sort() {
+  if (scoreboard_scores[0] > scoreboard_scores[1]) 
+    swap(scoreboard_scores[0], scoreboard_scores[1]);
+  if (scoreboard_scores[1] > scoreboard_scores[2]) 
+    swap(scoreboard_scores[1], scoreboard_scores[2]);
+  if (scoreboard_scores[2] > scoreboard_scores[0]) 
+    swap(scoreboard_scores[2], scoreboard_scores[0]);
+}
 
