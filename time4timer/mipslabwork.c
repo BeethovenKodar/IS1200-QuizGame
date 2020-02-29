@@ -17,13 +17,13 @@
 void *stdin, *stdout, *stderr; // Detta behövs för att använda standard biblioteken!
 
 /* Interrupt Service Routine */
-void user_isr( void )
+void user_isr (void)
 {
   return;
 }
 
 /* Lab-specific initialization goes here */
-void labinit( void )
+void labinit (void)
 {
   TMR2 = 0;                           // reset timer 2
   PR2 = (80000000 / 256) / 10;        // count in prescale (still 1s period) and also divide by 10 for 100ms (fits 16 bit)
@@ -60,11 +60,6 @@ void labwork(void)
   
   if (gameActive == 1)
   {
-
-    if(getsw() == 1)
-    {
-      display_string(0, "hej");
-    }
     if (IFS(0) & 0x100)                // time remaining
     {
       timeoutcount--;
@@ -72,7 +67,7 @@ void labwork(void)
       if (timeoutcount == 0)
       {
         char Str[31];
-        sprintf(Str, "%s%d   %d", scoreStr, score, time);
+        sprintf(Str, "%s%d %d %d", scoreStr, score, time, correct);
         display_string(3, Str);
         display_update();
         timeout = 0;

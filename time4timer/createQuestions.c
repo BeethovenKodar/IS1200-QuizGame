@@ -63,7 +63,6 @@ int create_question(int difficulty)
             break;
         }
     }
-    //
 
     display_string(0, question);
     genAnswers(result);
@@ -78,49 +77,63 @@ int answers[4];
 
 void genAnswers(int rightAnswer)
 {
-    int rightAnswerIndex = generateNum(0,4);
+    int rightAnswerIndex = generateNum(0, 4);
     answers[rightAnswerIndex] = rightAnswer;
 
-    int i = 0;
-    int j = 0;
-    int generatedFalseNumber;
-    while(i < 4)
+    if (0 != rightAnswerIndex)
     {
-        if (i != (rightAnswerIndex))
-        {
-            generatedFalseNumber = rightAnswer + generateNum(-5,6);
-            j = 0;
-            for(j = 0; j < 4; j++) 
-            {
-                while((answers[j] == generatedFalseNumber) || (answers[j] == rightAnswer))
-                {
-                    generatedFalseNumber = rightAnswer + generateNum(-5, 6);
-                }
-            }
-            answers[i] = generatedFalseNumber;
-        }
-        i++;
+        answers[0] = rightAnswer + generateNum(-6, -4);
     }
-    resultBTN = powerFunc(2, rightAnswerIndex); 
+    if (1 != rightAnswerIndex)
+    {
+        answers[1] = rightAnswer + generateNum(1, 3);
+    }
+    if (2 != rightAnswerIndex)
+    {
+        answers[2] = rightAnswer + generateNum(-3, -1);
+    }
+    if (3 != rightAnswerIndex)
+    {
+        answers[3] = rightAnswer + generateNum(3, 6);
+    }
+
+    resultBTN = invert(powerFunc(2, rightAnswerIndex));
 
     sprintf(row1, "A)%d  B)%d", answers[0], answers[1]);
     sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
 }
 
+int invert(int num)
+{
+    switch (num)
+    {
+        case 8:
+            return 1;
+            break;
+        case 4:
+            return 2;
+            break;
+        case 2:
+            return 4;
+            break;
+        case 1:
+            return 8;
+            break;    
+    }
+}
+
 int generateNum (int min, int max)          // Gives a result [min, max-1]
 {
     int random = (rand() % (max-min)) + min; 
-    return random;                  
+    return random;   
 } 
 
 int powerFunc (int base, int exponent)
 {
     int i;
     int number = 1;
-
     for (i = 0; i < exponent; ++i)
         number *= base;
-
     return(number);
 }
 
