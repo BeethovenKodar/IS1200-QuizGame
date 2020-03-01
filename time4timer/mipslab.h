@@ -47,6 +47,13 @@ extern char textbuffer[4][16];
    students must define their functions with the exact types
    specified in the laboratory instructions. */
 /* Written as part of asm lab: delay, time2string */
+void startScreen();
+void endScreen();
+void genAnswers(int rightAnswer);
+void scoreBoard();
+void sort();
+void swapStrings(char **a, char **b);
+
 void delay(int);
 void time2string( char *, int );
 /* Written as part of i/o lab: getbtns, getsw, enable_interrupt */
