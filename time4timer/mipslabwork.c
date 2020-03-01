@@ -132,7 +132,7 @@ void startScreen()
 
 
 int scoreboard_scores[3] = {0,0,0};
-char *name_ptr;
+char scoreboard_names[3][4] = {"AAA\0","AAA\0","AAA\0"}; // kan ta bort andra indexet?
 
 void endScreen()
 {
@@ -174,8 +174,11 @@ void endScreen()
       if(nameIndex == 3) 
       {
         // delay(5000); ????
-        scoreboard_scores[2] = score;
-        name_ptr = name;
+        if(score > scoreboard_scores[2]) {
+          scoreboard_scores[2] = score;
+          strcpy(scoreboard_names[2], name);
+          sort();
+        }
 
         /* Reset variables */
         time = 5;
@@ -185,7 +188,6 @@ void endScreen()
       }
     }
   }
-  sort();
   scoreBoard();
 }
 
@@ -195,7 +197,7 @@ void scoreBoard()
   display_clr();
   int i = 0;
   for(i; i < 3; i++) {
-    sprintf(Str, "%s%d %s%s", "Score:", scoreboard_scores[i], "Name:", name_ptr);
+    sprintf(Str, "%s%d %s%s", "Score:", scoreboard_scores[i], "Name:", scoreboard_names[i]);
     display_string(i, Str);
   }
   display_update();
@@ -209,13 +211,39 @@ void swap(int *a, int *b)
     *b = temp; 
 } 
 
-void sort() {
-  if (scoreboard_scores[0] > scoreboard_scores[1]) 
-    swap(&scoreboard_scores[0], &scoreboard_scores[1]);
-  if (scoreboard_scores[1] > scoreboard_scores[2]) 
-    swap(&scoreboard_scores[1],&scoreboard_scores[2]);
-  if (scoreboard_scores[2] > scoreboard_scores[0]) 
-    swap(&scoreboard_scores[2], &scoreboard_scores[0]);
+// void swapStrings(char *a, char *b) {
+//   char *temp;
+//   temp = malloc(4);
+//   strcpy(temp, *a);
+//   strcpy(*a, *b);
+//   strcpy(*b, temp);
+//   free(temp);
+// }
+
+void swapStrings(char **t1, char **t2) {
+    char *t;
+    t = *t1;
+    *t1 = *t2;
+    *t2 = t;
 }
+
+
+void sort() {
+  if (scoreboard_scores[0] > scoreboard_scores[1]) {
+    swap(&scoreboard_scores[0], &scoreboard_scores[1]);
+    swapStrings(&scoreboard_names[0], &scoreboard_names[1]);
+  }
+  if (scoreboard_scores[1] > scoreboard_scores[2]) {
+    swap(&scoreboard_scores[1],&scoreboard_scores[2]);
+    swapStrings(&scoreboard_names[1],&scoreboard_names[2]);
+
+  }
+  if (scoreboard_scores[2] > scoreboard_scores[0]) {
+    swap(&scoreboard_scores[2], &scoreboard_scores[0]);
+    swapStrings(&scoreboard_names[2], &scoreboard_names[0]);
+
+  }
+}
+
 
 //. /opt/mcb32tools/environment
