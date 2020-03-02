@@ -88,6 +88,39 @@ void genAnswers(int rightAnswer)
     int rightAnswerIndex = generateNum(0, 4);
     answers[rightAnswerIndex] = rightAnswer;
 
+    int i = 0;
+    for (i; i < 4; i++)
+    {
+        if (i != rightAnswerIndex)
+        {
+            int falseAnswer;
+            int valid = 0;
+            while (valid == 0)
+            {
+                falseAnswer = rightAnswer + generateNum(-5, 6);
+                int j = 0;
+                for (j; j < 4; j++)
+                {
+                    if (answers[j] == falseAnswer)
+                    {
+                        valid = 0;
+                        break;
+                    }
+                    valid = 1;
+                }
+            }
+            answers[i] = falseAnswer;
+        }
+    }
+    resultBTN = invert(powerFunc(2, rightAnswerIndex));
+
+    sprintf(row1, "A)%d  B)%d", answers[0], answers[1]);
+    sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
+
+    /*
+    int rightAnswerIndex = generateNum(0, 4);
+    answers[rightAnswerIndex] = rightAnswer;
+
     if (0 != rightAnswerIndex)
     {
         answers[0] = rightAnswer + generateNum(-6, -4);
@@ -109,9 +142,10 @@ void genAnswers(int rightAnswer)
 
     sprintf(row1, "A)%d  B)%d", answers[0], answers[1]);
     sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
+    */
 }
 
-
+/* Since BTN4 is to the most left (answers are a, b, c, d) we have to invert the buttons*/
 int invert(int num)
 {
     switch (num)
