@@ -126,7 +126,7 @@ void genAnswers(int rightAnswer)
         answers[0] = rightAnswer + generateNum(-6, -4);
     }
     if (1 != rightAnswerIndex)
-    {
+    {1
         answers[1] = rightAnswer + generateNum(1, 3);
     }
     if (2 != rightAnswerIndex)

@@ -106,7 +106,7 @@ void labwork(void)
   endScreen();
 }
 
-/* method to clear the display when moving from eg. startscreen to questions */
+/* Method to clear the display when moving from eg. startscreen to questions */
 void display_clr()
 {
   display_string(0, "");
@@ -159,7 +159,6 @@ void endScreen()
         name[nameIndex] = 65;
 
       name[nameIndex]++;
-
     }
 
     if (getbtns() == 4)           // Move to next char to edit
