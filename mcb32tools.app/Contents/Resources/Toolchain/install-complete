@@ -1,8 +1,0 @@
-#!/bin/sh
-
-printf '\n\n\033[32mInstallation complete!\033[0m\n'
-printf '**********************\n\n'
-printf 'You can enter the cross compiling environment by issuing the command:\n'
-printf '\033[36m. /Applications/mcb32tools.app/Contents/Resources/Toolchain/environment\033[0m\n'
-printf '\n'
-printf 'Note the space between the dot and the slash!\n\n'
