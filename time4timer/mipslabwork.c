@@ -37,38 +37,38 @@ void labinit (void)
   TRISFSET = 0x1;                     // set button 1 to input
   TRISDSET = 0x7F;                    // set button 2-4 and switch 1-4 to inputs
   
-  srand(TMR3);                 // give random generator seeds from TMR3
+  srand(TMR3);                        // give random generator seeds from TMR3
 }
 
 int gameActive = 0;
-int time = 15;
+int time = 6;
 int score = 0;
 int gameMode;  // 2easy, 4medium, 8hard
 int correct;
 
 void labwork(void)
 {
-  //
   int userAnswering = 0;
   int timeoutcount = 10;
-  // int timeout = 1;
-  //
+
+  /* Loop while difficulty isn't decided */
   while (gameActive == 0)
   { 
     startScreen();
   }
   
-  while (gameActive == 1 && time > -1 && getsw() != 0x4) //GETSW BARA FÖR DEBUG
+  /* Spelets loop. Här spelar användaren. GameActive bestämmer om startskärmen eller spelskärmen visas
+     Spelet avslutas när time är mindre än 0 */
+  while (gameActive == 1 && time > -1 && getsw() != 0x4) //  GETSW BARA FÖR DEBUG
   {
     char Str[31];
-    if (IFS(0) & 0x100)                // time remaining
+    if (IFS(0) & 0x100)                
     {
-      if (timeoutcount == 10)          // one second
+      if (timeoutcount == 10)          // gives one second
       {
-        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
+        sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time); // time remaining is updated once a second
         display_string(3, Str);
         display_update();
-        // timeout--;
         time--;
         timeoutcount = 0;
       }
@@ -76,6 +76,7 @@ void labwork(void)
       IFSCLR(0) = 0x100;
     }
 
+    /* Creates a new question if the user isn't answering */
     if (userAnswering == 0)
     {
       sprintf(Str, "%s%d %s%d", "Score:", score, "Time:", time);
@@ -86,11 +87,11 @@ void labwork(void)
       delay(2500);
     }
 
+    /* Handles the answer buttons, correct or incorrect answer */
     if (((getbtns() == 1) || (getbtns() == 2) || (getbtns() == 4) || (getbtns() == 8))) 
     {
       userAnswering = 0;
-      //timeout = 1;
-      TMR3 = TMR3 + (getbtns() * 1013);
+      TMR3 = TMR3 + (getbtns() * 1013);   // Not working properly
       if (correct == getbtns())
       {
         score++;
@@ -105,6 +106,7 @@ void labwork(void)
   endScreen();
 }
 
+/* method to clear the display when moving from eg. startscreen to questions */
 void display_clr()
 {
   display_string(0, "");
@@ -114,6 +116,7 @@ void display_clr()
   display_update();
 }
 
+/* Startscreen where the user gets to choose difficulty */
 void startScreen()
 {
   display_string(0, "MATH GENIUS?");
@@ -130,14 +133,15 @@ void startScreen()
   }
 }
 
-int scoreboard_scores[3] = {0,0,0};
-char scoreboard_names[3][4] = {"AAA","AAA","AAA"}; // kan ta bort andra indexet?
+/* Three arrays in an array for the three difficulties */
+int scoreboard_scores[3][3] = {{0,0,0}, {0,0,0}, {0,0,0}};
+char scoreboard_names[3][3][4] = {{"AAA","AAA","AAA"}, {"AAA","AAA","AAA"}, {"AAA","AAA","AAA"}};
 
 void endScreen()
 {
   int nameIndex = 0;
   char finalScore[16];
-  char displayName[16];
+  char displayName[16]; 
   char name[4] = {'A', 'A', 'A', '\0'};
   display_clr();
   sprintf(finalScore,"Your score: %d", score);
@@ -149,7 +153,7 @@ void endScreen()
     display_string(3, displayName);
     display_update();
 
-    if (getbtns() == 8)
+    if (getbtns() == 8)           // Moves to next char in ASCII table
     {
       if (name[nameIndex] == 90)  // If the char increments above Z it will reset to A
         name[nameIndex] = 65;
@@ -158,40 +162,57 @@ void endScreen()
 
     }
 
-    if (getbtns() == 4)
+    if (getbtns() == 4)           // Move to next char to edit
       nameIndex++;
     
     delay(1250);
   }
   
-  if (score >= scoreboard_scores[2]) 
+  /* Check to see if the produced score should be put on the scoreboard */
+  if (score >= scoreboard_scores[hiScore()][2]) 
   {
-    scoreboard_scores[2] = score;
-    strcpy(scoreboard_names[2], name);
+    scoreboard_scores[hiScore()][2] = score;
+    strcpy(scoreboard_names[hiScore()][2], name);
     sort();
   }
   
+  /* Reset variables */
   scoreBoard();
-  time = 5;
+  time = 6;
   score = 0;
   gameActive = 0;
 }
 
+/* Checks which scoreboard to display, based of difficulty */
 void scoreBoard()
 {
   char Str[31];
   display_clr();
-  display_string(0, "   Scoreboard");
+  if (hiScore() == 0)
+  {
+    display_string(0, "Scoreboard E:");
+  }
+  if (hiScore() == 1)
+  {
+    display_string(0, "Scoreboard M:");
+  }  
+  if (hiScore() == 2)
+  {
+    display_string(0, "Scoreboard H:");
+  }
+  display_update();
+  
   int i = 0;
   for(i; i < 3; i++)
   {
-    sprintf(Str, " %s %s%d", scoreboard_names[i], "Score:", scoreboard_scores[i]);
+    sprintf(Str, "%s %s%d", scoreboard_names[hiScore()][i], "Score:", scoreboard_scores[hiScore()][i]);
     display_string(i+1, Str);
   }
   display_update();
-  delay(25000);
+  delay(60000);
 }
 
+/* Normal swap of two numbers with temp variable */
 void swap(int *a, int *b) 
 { 
     int temp = *a; 
@@ -199,6 +220,7 @@ void swap(int *a, int *b)
     *b = temp; 
 } 
 
+/* Swap strings. char ** because "pointer to pointer to char" */
 void swapStrings(char **a, char **b) 
 {
     char *t;
@@ -207,6 +229,7 @@ void swapStrings(char **a, char **b)
     *b = t;
 }
 
+/* Sort the active scoreboard with selection sort  */
 void sort()
 {
   int i = 0;
@@ -217,11 +240,11 @@ void sort()
     int j = 0;
     for (j = i+1; j < 3; j++)
     {
-      if (scoreboard_scores[biggestIndex] < scoreboard_scores[j])
+      if (scoreboard_scores[hiScore()][biggestIndex] < scoreboard_scores[hiScore()][j])
         biggestIndex = j;
     }
-    swap(&scoreboard_scores[biggestIndex], &scoreboard_scores[i]);
-    swapStrings(&scoreboard_names[biggestIndex], &scoreboard_names[i]);
+    swap(&scoreboard_scores[hiScore()][biggestIndex], &scoreboard_scores[hiScore()][i]);
+    swapStrings(&scoreboard_names[hiScore()][biggestIndex], &scoreboard_names[hiScore()][i]);
   }
   
 }

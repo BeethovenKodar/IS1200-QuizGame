@@ -11,6 +11,7 @@ int LB;             // lower bound for random
 char question[16];  // generated question
 char row1[16];      // row 1 on display
 char row2[16];      // row 2 on display
+int hScore;
 
 // returns button for right answer
 int create_question(int difficulty)     
@@ -20,16 +21,20 @@ int create_question(int difficulty)
     {
         UB = 11;
         LB = 1;
+        hScore = 0;
     }
     if (difficulty == 4)      // MEDIUM (numbers between 10-20)
     {
         UB = 21;
         LB = 10;
+        hScore = 1;
     }
     if (difficulty == 8)      // HARD (numbers between 80-100)
     {
         UB = 101;
         LB = 80;
+        hScore = 2;
+        
     }
     //
 
@@ -75,6 +80,9 @@ int create_question(int difficulty)
 
 int answers[4];
 
+/* Generates the answers by intitally randomly inserting the right answer
+   and then filling the remaining indexes with randomly generated wrong answers
+ */
 void genAnswers(int rightAnswer)
 {
     int rightAnswerIndex = generateNum(0, 4);
@@ -103,6 +111,7 @@ void genAnswers(int rightAnswer)
     sprintf(row2, "C)%d  D)%d", answers[2], answers[3]);
 }
 
+
 int invert(int num)
 {
     switch (num)
@@ -125,7 +134,7 @@ int invert(int num)
 int generateNum (int min, int max)          // Gives a result [min, max-1]
 {
     int random = (rand() % (max-min)) + min; 
-    return random;   
+    return random;
 } 
 
 int powerFunc (int base, int exponent)
@@ -135,6 +144,10 @@ int powerFunc (int base, int exponent)
     for (i = 0; i < exponent; ++i)
         number *= base;
     return(number);
+}
+
+int hiScore(){
+    return hScore;
 }
 
 
